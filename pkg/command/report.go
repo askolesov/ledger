@@ -2,8 +2,9 @@ package command
 
 import (
 	"fmt"
-	"go-finances/pkg/model_v1"
 	"os"
+
+	v1 "go-finances/pkg/ledger/v1"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
@@ -19,7 +20,7 @@ func getReportCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := args[0]
 
-			data, err := model_v1.ReadData(path)
+			data, err := v1.ReadData(path)
 			if err != nil {
 				return err
 			}
@@ -46,7 +47,7 @@ func getReportCmd() *cobra.Command {
 	return cmd
 }
 
-func MonthlyReport(d model_v1.Data) {
+func MonthlyReport(d v1.Data) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Year", "Month", "Starting", "Income", "Expenses", "Ending"})
@@ -69,7 +70,7 @@ func MonthlyReport(d model_v1.Data) {
 	t.Render()
 }
 
-func ShortMonthlyReport(d model_v1.Data) {
+func ShortMonthlyReport(d v1.Data) {
 	for _, year := range d.Years {
 		for _, month := range year.Months {
 			fmt.Printf("%.1f\n", float64(month.Expenses())/1000)

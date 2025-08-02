@@ -1,0 +1,116 @@
+package v2
+
+import (
+	"fmt"
+	"sort"
+
+	"github.com/samber/lo"
+)
+
+// Month represents a month with accounts
+type Month struct {
+	OpeningBalance int                `json:"opening_balance" yaml:"opening_balance" toml:"opening_balance"`
+	ClosingBalance int                `json:"closing_balance" yaml:"closing_balance" toml:"closing_balance"`
+	Accounts       map[string]Account `json:"accounts" yaml:"accounts" toml:"accounts"`
+}
+
+// Validate validates a month according to OLF v2.0 rules
+func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
+	if monthNum < 1 || monthNum > 12 {
+		return fmt.Errorf("month number must be between 1 and 12, got %d", monthNum)
+	}
+
+	if len(m.Accounts) == 0 {
+		return fmt.Errorf("month %d has no accounts", monthNum)
+	}
+
+	// Validate accounts
+	for accountName, account := range m.Accounts {
+		if err := account.Validate(year, monthNum); err != nil {
+			return fmt.Errorf("account %s: %w", accountName, err)
+		}
+	}
+
+	// M-2: Month opening_balance equals sum of all account opening_balance values
+	accountsOpeningSum := lo.SumBy(lo.Values(m.Accounts), func(account Account) int {
+		return account.OpeningBalance
+	})
+	if m.OpeningBalance != accountsOpeningSum {
+		return fmt.Errorf("month opening balance %d does not equal sum of account opening balances %d",
+			m.OpeningBalance, accountsOpeningSum)
+	}
+
+	// M-2: Month closing_balance equals sum of all account closing_balance values
+	accountsClosingSum := lo.SumBy(lo.Values(m.Accounts), func(account Account) int {
+		return account.ClosingBalance
+	})
+	if m.ClosingBalance != accountsClosingSum {
+		return fmt.Errorf("month closing balance %d does not equal sum of account closing balances %d",
+			m.ClosingBalance, accountsClosingSum)
+	}
+
+	// M-3: Within each month, Σ(entry.amount where internal = true) must equal 0
+	internalSum := lo.SumBy(lo.Values(m.Accounts), func(account Account) int {
+		return account.InternalEntriesSum()
+	})
+	if internalSum != 0 {
+		return fmt.Errorf("sum of internal entries must be 0, got %d", internalSum)
+	}
+
+	if prevMonth != nil {
+		// M-1: Consecutive months must chain totals
+		if prevMonth.ClosingBalance != m.OpeningBalance {
+			return fmt.Errorf("previous month closing balance %d does not equal current month opening balance %d",
+				prevMonth.ClosingBalance, m.OpeningBalance)
+		}
+
+		for accountName, account := range m.Accounts {
+			if prevAccount, exists := prevMonth.Accounts[accountName]; exists {
+				// A-2: If an account exists in consecutive months, prev.closing_balance = next.opening_balance
+				if prevAccount.ClosingBalance != account.OpeningBalance {
+					return fmt.Errorf("account %s: previous month closing balance %d does not equal current month opening balance %d",
+						accountName, prevAccount.ClosingBalance, account.OpeningBalance)
+				}
+			} else {
+				// A-3: A new account must start with opening_balance = 0
+				if account.OpeningBalance != 0 {
+					return fmt.Errorf("account %s: new account must start with opening balance 0, got %d",
+						accountName, account.OpeningBalance)
+				}
+			}
+		}
+
+		// A-3: An account may be omitted in later months only if its last closing_balance = 0
+		for accountName, prevAccount := range prevMonth.Accounts {
+			if _, exists := m.Accounts[accountName]; !exists {
+				if prevAccount.ClosingBalance != 0 {
+					return fmt.Errorf("account %s: cannot be omitted because previous month closing balance is %d (must be 0)",
+						accountName, prevAccount.ClosingBalance)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// Income returns the sum of income from all accounts
+func (m Month) Income() int {
+	return lo.SumBy(lo.Values(m.Accounts), func(account Account) int {
+		return account.Income()
+	})
+}
+
+// Expenses returns the sum of expenses from all accounts
+func (m Month) Expenses() int {
+	return lo.SumBy(lo.Values(m.Accounts), func(account Account) int {
+		return account.Expenses()
+	})
+}
+
+// GetAccountNames returns sorted list of account names
+func (m Month) GetAccountNames() []string {
+	names := lo.Keys(m.Accounts)
+	sort.Strings(names)
+	return names
+}

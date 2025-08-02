@@ -1,7 +1,7 @@
 package command
 
 import (
-	"go-finances/pkg/model_v1"
+	v1 "go-finances/pkg/ledger/v1"
 
 	"github.com/spf13/cobra"
 )
@@ -14,7 +14,7 @@ func getValidateCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := args[0]
 
-			data, err := model_v1.ReadData(path)
+			data, err := v1.ReadData(path)
 			if err != nil {
 				return err
 			}
