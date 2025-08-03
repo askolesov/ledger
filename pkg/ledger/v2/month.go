@@ -16,10 +16,12 @@ type Month struct {
 
 // Validate validates a month according to OLF v2.0 rules
 func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
+	// M-0: Month key (monthNum) must be between 1 and 12 (inclusive)
 	if monthNum < 1 || monthNum > 12 {
 		return fmt.Errorf("month number must be between 1 and 12, got %d", monthNum)
 	}
 
+	// M-5: A Month must contain at least one Account entry
 	if len(m.Accounts) == 0 {
 		return fmt.Errorf("month %d has no accounts", monthNum)
 	}
@@ -56,7 +58,7 @@ func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 			m.ClosingBalance, accountsClosingSum)
 	}
 
-	// M-3: Within each month, Σ(entry.amount where internal = true) must equal 0
+	// M-4: Within each month, Σ(entry.amount where internal = true) must equal 0 (double-entry constraint)
 	internalSum := lo.SumBy(lo.Values(m.Accounts), func(account Account) int {
 		return account.InternalEntriesSum()
 	})

@@ -1,26 +1,35 @@
 # Open Ledger Format — Personal Finance (v2.0)
 
-> *A minimal, human‑readable schema for everyday finances that keeps every cent accounted for.*
+*A minimal, human‑readable schema for everyday finances that keeps every cent accounted for.*
+
+---
+
+## Table of contents
+
+1. [Overview](#1-overview)
+2. [Data Model](#2-data-model)
+3. [Validation Rules (invariants)](#3-validation-rules-invariants)
+4. [Example (YAML)](#4-example-yaml)
+5. [Versioning](#5-versioning)
+6. [License](#6-license)
 
 ---
 
 ## 1. Overview
 
-The **Open Ledger Format (OLF)** stores personal‑finance data in plain‑text files—**YAML, JSON, or TOML**.
+The **Open Ledger Format (OLF)** stores personal‑finance data in plain‑text files—**YAML, JSON**.
 
-**Design principles**
+### Design principles
 
-1. **Human‑oriented** — anyone can maintain the file with a plain text editor.
-
+1. **Human‑oriented** — anyone can maintain the file with a plain‑text editor.
 2. **Consistency** — validation rules ensure strict, deterministic balances across the log.
-
-3. **High‑level focus** — summary budgeting (≈ \$100–\$1 000 chunks), not coffee‑by‑coffee logging.
+3. **High‑level focus** — summary budgeting (≈ \$100–\$1 000 chunks), not coffee‑by‑coffee logging.
 
 ---
 
 ## 2 Data Model
 
-```
+```text
 Ledger (root)
 └─ Years{int}          → Year
      └─ Months{int}    (1–12) → Month
@@ -54,9 +63,9 @@ All monetary amounts are **signed integers**. A ledger adopts one currency unit 
 
 ### 2.5 `Entry`
 
-* **amount** (*int*) — signed value; positive = income, negative = expense.
+* **amount** (*int*) — signed value; positive = income, negative = expense. **Required**.
 * **internal** (*bool, optional*) — `true` if the entry transfers money between two accounts in the same ledger. Defaults to `false`.
-* **note** (*string*) — non‑empty description.
+* **note** (*string*) — non‑empty description. **Required**.
 * **date** (*string, optional*) — ISO‑8601 date (`YYYY‑MM‑DD`).
 * **tag** (*string, optional*) — category label.
 
@@ -66,14 +75,20 @@ All monetary amounts are **signed integers**. A ledger adopts one currency unit 
 
 ### Year‑level
 
+0. **Y‑0** — Year key (`yearNum`) **must be a positive integer** (`yearNum > 0`).
 1. **Y‑1** — Consecutive years must chain totals: `prev.closing_balance = next.opening_balance`.
-2. **Y‑2** — A year’s `opening_balance` equals the first month’s `opening_balance`, and its `closing_balance` equals the last month’s `closing_balance`.
+2. **Y‑2** — A year’s `opening_balance` equals the first month’s `opening_balance`.
+3. **Y‑3** — A year’s `closing_balance` equals the last month’s `closing_balance`.
+4. **Y‑4** — A `Year` **must contain at least one `Month`** entry.
 
 ### Month‑level
 
+0. **M‑0** — Month key (`monthNum`) **must be between 1 and 12** (inclusive).
 1. **M‑1** — Consecutive months (including across years) must chain totals: `prev.closing_balance = next.opening_balance`.
-2. **M‑2** — A month’s `opening_balance` equals the sum of all account `opening_balance` values; its `closing_balance` equals the sum of all account `closing_balance` values.
-3. **M‑3** — Within each month, Σ(`entry.amount` where `internal = true`) **must equal 0** (double‑entry constraint).
+2. **M‑2** — A month’s `opening_balance` equals the sum of all account `opening_balance` values.
+3. **M‑3** — A month’s `closing_balance` equals the sum of all account `closing_balance` values.
+4. **M‑4** — Within each month, Σ(`entry.amount` where `internal = true`) **must equal 0** (double‑entry constraint).
+5. **M‑5** — A `Month` **must contain at least one `Account`** entry.
 
 ### Account‑level
 
@@ -85,12 +100,14 @@ All monetary amounts are **signed integers**. A ledger adopts one currency unit 
 ### Entry‑level
 
 1. **E‑1** — If an entry has a `date`, that date **must lie within the year and month of its parent `Month` object**.
+2. **E‑2** — Every `Entry` **must include both `amount` and non‑empty `note` fields**.
+3. **E‑3** — If `date` is present, **it must strictly follow the ISO‑8601 `YYYY‑MM‑DD` format**.
 
 *A file that violates any invariant is non‑conforming.*
 
 ---
 
-## 4. Example (YAML)
+## 4 Example (YAML)
 
 ```yaml
 years:

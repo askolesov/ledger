@@ -16,10 +16,12 @@ type Year struct {
 
 // Validate validates a year according to OLF v2.0 rules
 func (y Year) Validate(yearNum int, prevYear *Year) error {
+	// Y-0: Year key (yearNum) must be a positive integer (yearNum > 0)
 	if yearNum < 1 {
 		return fmt.Errorf("year number must be greater than 0, got %d", yearNum)
 	}
 
+	// Y-4: A Year must contain at least one Month entry
 	if len(y.Months) == 0 {
 		return fmt.Errorf("year %d has no months", yearNum)
 	}
@@ -62,7 +64,7 @@ func (y Year) Validate(yearNum int, prevYear *Year) error {
 			y.OpeningBalance, firstMonth.OpeningBalance)
 	}
 
-	// Y-2: Year closing_balance equals last month's closing_balance
+	// Y-3: Year closing_balance equals last month's closing_balance
 	lastMonth := y.Months[monthNums[len(monthNums)-1]]
 	if y.ClosingBalance != lastMonth.ClosingBalance {
 		return fmt.Errorf("year closing balance %d does not equal last month closing balance %d",

@@ -18,6 +18,8 @@ type Entry struct {
 
 // Validate validates an entry according to OLF v2.0 rules
 func (e Entry) Validate(year, month int) error {
+	// E-2: Every Entry must include both amount and non-empty note fields
+	// E-3: If date is present, it must strictly follow the ISO-8601 YYYY-MM-DD format
 	err := validation.ValidateStruct(&e,
 		validation.Field(&e.Amount, validation.Required),
 		validation.Field(&e.Note, validation.Required, validation.Length(1, 0)),
@@ -32,6 +34,7 @@ func (e Entry) Validate(year, month int) error {
 		return fmt.Errorf("invalid date format: %w", err)
 	}
 
+	// E-1: If an entry has a date, that date must lie within the year and month of its parent Month object
 	if ok {
 		if year != 0 && date.Year() != year {
 			return fmt.Errorf("entry date year %d does not match expected year %d", date.Year(), year)

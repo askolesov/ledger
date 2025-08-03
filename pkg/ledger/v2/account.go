@@ -22,7 +22,7 @@ func (a Account) Validate(year, month int, prevAccount *Account) error {
 		}
 	}
 
-	// A-1: opening_balance + Σ(entry.amount) = closing_balance
+	// A-1: For every account: opening_balance + Σ(entry.amount) = closing_balance
 	calculatedBalance := a.OpeningBalance + a.EntriesSum()
 	if calculatedBalance != a.ClosingBalance {
 		return fmt.Errorf("opening balance %d + entries sum %d = %d does not equal closing balance %d",
@@ -30,7 +30,7 @@ func (a Account) Validate(year, month int, prevAccount *Account) error {
 	}
 
 	if prevAccount != nil {
-		// A-2: opening_balance equals previous month's closing_balance
+		// A-2: If an account exists in consecutive months, prev.closing_balance = next.opening_balance
 		if a.OpeningBalance != prevAccount.ClosingBalance {
 			return fmt.Errorf("opening balance %d does not equal previous month's closing balance %d",
 				a.OpeningBalance, prevAccount.ClosingBalance)
