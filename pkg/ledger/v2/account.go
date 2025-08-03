@@ -14,7 +14,7 @@ type Account struct {
 }
 
 // Validate validates an account according to OLF v2.0 rules
-func (a Account) Validate(year, month int) error {
+func (a Account) Validate(year, month int, prevAccount *Account) error {
 	// Validate all entries
 	for i, entry := range a.Entries {
 		if err := entry.Validate(year, month); err != nil {
@@ -27,6 +27,19 @@ func (a Account) Validate(year, month int) error {
 	if calculatedBalance != a.ClosingBalance {
 		return fmt.Errorf("opening balance %d + entries sum %d = %d does not equal closing balance %d",
 			a.OpeningBalance, a.EntriesSum(), calculatedBalance, a.ClosingBalance)
+	}
+
+	if prevAccount != nil {
+		// A-2: opening_balance equals previous month's closing_balance
+		if a.OpeningBalance != prevAccount.ClosingBalance {
+			return fmt.Errorf("opening balance %d does not equal previous month's closing balance %d",
+				a.OpeningBalance, prevAccount.ClosingBalance)
+		}
+	} else {
+		// A-3: A new account must start with opening_balance = 0
+		if a.OpeningBalance != 0 {
+			return fmt.Errorf("new account must start with opening balance 0, got %d", a.OpeningBalance)
+		}
 	}
 
 	return nil

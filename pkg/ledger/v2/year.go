@@ -28,6 +28,12 @@ func (y Year) Validate(yearNum int, prevYear *Year) error {
 	var prevMonth *Month
 
 	if prevYear != nil {
+		// Y-1: Consecutive years must chain totals: prev.closing_balance = next.opening_balance
+		if y.OpeningBalance != prevYear.ClosingBalance {
+			return fmt.Errorf("year opening balance %d does not equal previous year closing balance %d",
+				y.OpeningBalance, prevYear.ClosingBalance)
+		}
+
 		prevYearMonthNums := lo.Keys(prevYear.Months)
 		sort.Ints(prevYearMonthNums)
 

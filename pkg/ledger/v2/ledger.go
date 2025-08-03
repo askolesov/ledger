@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -9,14 +8,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/BurntSushi/toml"
 	"github.com/samber/lo"
 	"gopkg.in/yaml.v3"
 )
 
 // Ledger represents the root structure of the Open Ledger Format v2.0
 type Ledger struct {
-	Years map[int]*Year `json:"years" yaml:"years" toml:"years"`
+	Years map[int]Year `json:"years" yaml:"years" toml:"years"`
 }
 
 // Validate validates the entire ledger according to OLF v2.0 rules
@@ -29,23 +27,12 @@ func (l Ledger) Validate() error {
 	var prevYear *Year
 	for _, yearNum := range yearNums {
 		year := l.Years[yearNum]
-		if year == nil {
-			return fmt.Errorf("year %d is nil", yearNum)
-		}
-
-		// Y-1: Consecutive years must chain totals
-		if prevYear != nil {
-			if prevYear.ClosingBalance != year.OpeningBalance {
-				return fmt.Errorf("year %d opening balance %d does not equal previous year closing balance %d",
-					yearNum, year.OpeningBalance, prevYear.ClosingBalance)
-			}
-		}
 
 		if err := year.Validate(yearNum, prevYear); err != nil {
 			return fmt.Errorf("year %d: %w", yearNum, err)
 		}
 
-		prevYear = year
+		prevYear = &year
 	}
 
 	return nil
@@ -53,14 +40,14 @@ func (l Ledger) Validate() error {
 
 // Income returns the total income across all years
 func (l Ledger) Income() int {
-	return lo.SumBy(lo.Values(l.Years), func(year *Year) int {
+	return lo.SumBy(lo.Values(l.Years), func(year Year) int {
 		return year.Income()
 	})
 }
 
 // Expenses returns the total expenses across all years
 func (l Ledger) Expenses() int {
-	return lo.SumBy(lo.Values(l.Years), func(year *Year) int {
+	return lo.SumBy(lo.Values(l.Years), func(year Year) int {
 		return year.Expenses()
 	})
 }
@@ -78,8 +65,6 @@ func ReadLedger(path string) (Ledger, error) {
 		err = json.Unmarshal(bytes, &ledger)
 	case ".yaml", ".yml":
 		err = yaml.Unmarshal(bytes, &ledger)
-	case ".toml":
-		err = toml.Unmarshal(bytes, &ledger)
 	default:
 		return Ledger{}, fmt.Errorf("unsupported file format: %s", filepath.Ext(path))
 	}
@@ -101,10 +86,6 @@ func WriteLedger(ledger Ledger, path string) error {
 		data, err = json.MarshalIndent(ledger, "", "  ")
 	case ".yaml", ".yml":
 		data, err = yaml.Marshal(ledger)
-	case ".toml":
-		buf := bytes.NewBuffer(nil)
-		err = toml.NewEncoder(buf).Encode(ledger)
-		data = buf.Bytes()
 	default:
 		return fmt.Errorf("unsupported file format: %s", filepath.Ext(path))
 	}

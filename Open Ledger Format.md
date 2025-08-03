@@ -79,7 +79,8 @@ All monetary amounts are **signed integers**. A ledger adopts one currency unit 
 
 1. **A‑1** — For every account: `opening_balance + Σ(entry.amount) = closing_balance`.
 2. **A‑2** — If an account exists in consecutive months, `prev.closing_balance = next.opening_balance`.
-3. **A‑3** — A new account must start with `opening_balance = 0`. An account may be omitted in later months only if its last `closing_balance = 0`.
+3. **A‑3** — A new account must start with `opening_balance = 0`.
+4. **A‑4** — An account may be omitted in later months only if its last `closing_balance = 0`.
 
 ### Entry‑level
 

@@ -14,9 +14,7 @@ import (
 
 func TestReadLedger(t *testing.T) {
 	// Create a temporary directory for test files
-	tempDir, err := os.MkdirTemp("", "ledger_test")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	t.Run("read YAML file", func(t *testing.T) {
 		yamlContent := `years:
@@ -49,7 +47,7 @@ func TestReadLedger(t *testing.T) {
 `
 
 		yamlFile := filepath.Join(tempDir, "test.yaml")
-		err := os.WriteFile(yamlFile, []byte(yamlContent), 0644)
+		err := os.WriteFile(yamlFile, []byte(yamlContent), 0666)
 		require.NoError(t, err)
 
 		ledger, err := ReadLedger(yamlFile)
@@ -120,52 +118,6 @@ func TestReadLedger(t *testing.T) {
 		assert.Equal(t, "Salary", ledger.Years[2025].Months[1].Accounts["Checking"].Entries[0].Note)
 	})
 
-	t.Run("read TOML file", func(t *testing.T) {
-		tomlContent := `[years.2025]
-opening_balance = 1000
-closing_balance = 1050
-
-[years.2025.months.1]
-opening_balance = 1000
-closing_balance = 1050
-
-[years.2025.months.1.accounts.Checking]
-opening_balance = 600
-closing_balance = 620
-
-[[years.2025.months.1.accounts.Checking.entries]]
-amount = 50
-internal = false
-note = "Salary"
-date = "2025-01-28"
-tag = "Income"
-
-[years.2025.months.1.accounts.Savings]
-opening_balance = 400
-closing_balance = 430
-
-[[years.2025.months.1.accounts.Savings.entries]]
-amount = 30
-internal = false
-note = "Interest"
-date = "2025-01-31"
-tag = "Income"
-`
-
-		tomlFile := filepath.Join(tempDir, "test.toml")
-		err := os.WriteFile(tomlFile, []byte(tomlContent), 0644)
-		require.NoError(t, err)
-
-		ledger, err := ReadLedger(tomlFile)
-		require.NoError(t, err)
-
-		// Validate structure
-		assert.Equal(t, 1000, ledger.Years[2025].OpeningBalance)
-		assert.Equal(t, 1050, ledger.Years[2025].ClosingBalance)
-		assert.Equal(t, 600, ledger.Years[2025].Months[1].Accounts["Checking"].OpeningBalance)
-		assert.Equal(t, "Salary", ledger.Years[2025].Months[1].Accounts["Checking"].Entries[0].Note)
-	})
-
 	t.Run("unsupported file format", func(t *testing.T) {
 		txtFile := filepath.Join(tempDir, "test.txt")
 		err := os.WriteFile(txtFile, []byte("some content"), 0644)
@@ -201,7 +153,7 @@ func TestWriteLedger(t *testing.T) {
 
 	// Test data
 	testLedger := Ledger{
-		Years: map[int]*Year{
+		Years: map[int]Year{
 			2025: {
 				OpeningBalance: 1000,
 				ClosingBalance: 1050,
@@ -238,8 +190,7 @@ func TestWriteLedger(t *testing.T) {
 		// Read it back and verify
 		ledger, err := ReadLedger(yamlFile)
 		require.NoError(t, err)
-		assert.Equal(t, 1000, ledger.Years[2025].OpeningBalance)
-		assert.Equal(t, "Salary", ledger.Years[2025].Months[1].Accounts["Checking"].Entries[0].Note)
+		assert.Equal(t, testLedger, ledger)
 	})
 
 	t.Run("write JSON file", func(t *testing.T) {
@@ -250,15 +201,7 @@ func TestWriteLedger(t *testing.T) {
 		// Read it back and verify
 		ledger, err := ReadLedger(jsonFile)
 		require.NoError(t, err)
-		assert.Equal(t, 1000, ledger.Years[2025].OpeningBalance)
-		assert.Equal(t, "Salary", ledger.Years[2025].Months[1].Accounts["Checking"].Entries[0].Note)
-	})
-
-	t.Run("write TOML file - not implemented", func(t *testing.T) {
-		tomlFile := filepath.Join(tempDir, "output.toml")
-		err := WriteLedger(testLedger, tomlFile)
-		require.Error(t, err)
-		assert.Contains(t, err.Error(), "TOML writing not yet implemented")
+		assert.Equal(t, testLedger, ledger)
 	})
 
 	t.Run("unsupported file format", func(t *testing.T) {
@@ -271,7 +214,7 @@ func TestWriteLedger(t *testing.T) {
 
 func TestLedger_String(t *testing.T) {
 	ledger := Ledger{
-		Years: map[int]*Year{
+		Years: map[int]Year{
 			2025: {
 				OpeningBalance: 1000,
 				ClosingBalance: 1050,
@@ -311,7 +254,7 @@ func TestLedger_String(t *testing.T) {
 
 func TestLedger_IncomeAndExpenses(t *testing.T) {
 	ledger := Ledger{
-		Years: map[int]*Year{
+		Years: map[int]Year{
 			2025: {
 				OpeningBalance: 1000,
 				ClosingBalance: 1150,
@@ -352,7 +295,7 @@ func TestLedger_IncomeAndExpenses(t *testing.T) {
 
 func TestLedger_GetYearNumbers(t *testing.T) {
 	ledger := Ledger{
-		Years: map[int]*Year{
+		Years: map[int]Year{
 			2025: {OpeningBalance: 1000, ClosingBalance: 1100, Months: map[int]Month{}},
 			2023: {OpeningBalance: 800, ClosingBalance: 900, Months: map[int]Month{}},
 			2024: {OpeningBalance: 900, ClosingBalance: 1000, Months: map[int]Month{}},

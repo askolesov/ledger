@@ -26,7 +26,14 @@ func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 
 	// Validate accounts
 	for accountName, account := range m.Accounts {
-		if err := account.Validate(year, monthNum); err != nil {
+		var prevAccount *Account
+		if prevMonth != nil {
+			if val, ok := prevMonth.Accounts[accountName]; ok {
+				prevAccount = &val
+			}
+		}
+
+		if err := account.Validate(year, monthNum, prevAccount); err != nil {
 			return fmt.Errorf("account %s: %w", accountName, err)
 		}
 	}
@@ -64,23 +71,7 @@ func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 				prevMonth.ClosingBalance, m.OpeningBalance)
 		}
 
-		for accountName, account := range m.Accounts {
-			if prevAccount, exists := prevMonth.Accounts[accountName]; exists {
-				// A-2: If an account exists in consecutive months, prev.closing_balance = next.opening_balance
-				if prevAccount.ClosingBalance != account.OpeningBalance {
-					return fmt.Errorf("account %s: previous month closing balance %d does not equal current month opening balance %d",
-						accountName, prevAccount.ClosingBalance, account.OpeningBalance)
-				}
-			} else {
-				// A-3: A new account must start with opening_balance = 0
-				if account.OpeningBalance != 0 {
-					return fmt.Errorf("account %s: new account must start with opening balance 0, got %d",
-						accountName, account.OpeningBalance)
-				}
-			}
-		}
-
-		// A-3: An account may be omitted in later months only if its last closing_balance = 0
+		// A-4: An account may be omitted in later months only if its last closing_balance = 0
 		for accountName, prevAccount := range prevMonth.Accounts {
 			if _, exists := m.Accounts[accountName]; !exists {
 				if prevAccount.ClosingBalance != 0 {
