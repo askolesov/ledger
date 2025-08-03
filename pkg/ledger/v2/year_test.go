@@ -47,7 +47,7 @@ func TestYear_Validate(t *testing.T) {
 			},
 			yearNum: 0,
 			wantErr: true,
-			errMsg:  "year number must be greater than 0",
+			errMsg:  "Y-0: year number must be greater than 0",
 		},
 		{
 			name: "year with no months",
@@ -58,7 +58,7 @@ func TestYear_Validate(t *testing.T) {
 			},
 			yearNum: 1,
 			wantErr: true,
-			errMsg:  "year 1 has no months",
+			errMsg:  "Y-4: year must contain at least one month",
 		},
 		{
 			name: "opening balance mismatch",
@@ -69,7 +69,7 @@ func TestYear_Validate(t *testing.T) {
 			},
 			yearNum: 1,
 			wantErr: true,
-			errMsg:  "year opening balance 50 does not equal first month opening balance 0",
+			errMsg:  "Y-2: year opening balance does not equal first month opening balance (expected: 0, got: 50)",
 		},
 		{
 			name: "closing balance mismatch",
@@ -80,7 +80,7 @@ func TestYear_Validate(t *testing.T) {
 			},
 			yearNum: 1,
 			wantErr: true,
-			errMsg:  "year closing balance 50 does not equal last month closing balance 100",
+			errMsg:  "Y-3: year closing balance does not equal last month closing balance (expected: 100, got: 50)",
 		},
 		{
 			name: "consecutive years",
@@ -155,7 +155,7 @@ func TestYear_Validate(t *testing.T) {
 			},
 			yearNum: 2,
 			wantErr: true,
-			errMsg:  "year opening balance 200 does not equal previous year closing balance 100",
+			errMsg:  "Y-1: year opening balance does not equal previous year closing balance (expected: 100, got: 200)",
 		},
 	}
 

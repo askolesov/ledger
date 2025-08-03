@@ -18,12 +18,12 @@ type Year struct {
 func (y Year) Validate(yearNum int, prevYear *Year) error {
 	// Y-0: Year key (yearNum) must be a positive integer (yearNum > 0)
 	if yearNum < 1 {
-		return fmt.Errorf("year number must be greater than 0, got %d", yearNum)
+		return fmt.Errorf("Y-0: year number must be greater than 0 (got: %d)", yearNum)
 	}
 
 	// Y-4: A Year must contain at least one Month entry
 	if len(y.Months) == 0 {
-		return fmt.Errorf("year %d has no months", yearNum)
+		return fmt.Errorf("Y-4: year must contain at least one month")
 	}
 
 	// Validate months
@@ -32,8 +32,8 @@ func (y Year) Validate(yearNum int, prevYear *Year) error {
 	if prevYear != nil {
 		// Y-1: Consecutive years must chain totals: prev.closing_balance = next.opening_balance
 		if y.OpeningBalance != prevYear.ClosingBalance {
-			return fmt.Errorf("year opening balance %d does not equal previous year closing balance %d",
-				y.OpeningBalance, prevYear.ClosingBalance)
+			return fmt.Errorf("Y-1: year opening balance does not equal previous year closing balance (expected: %d, got: %d)",
+				prevYear.ClosingBalance, y.OpeningBalance)
 		}
 
 		prevYearMonthNums := lo.Keys(prevYear.Months)
@@ -60,15 +60,15 @@ func (y Year) Validate(yearNum int, prevYear *Year) error {
 	// Y-2: Year opening_balance equals first month's opening_balance
 	firstMonth := y.Months[monthNums[0]]
 	if y.OpeningBalance != firstMonth.OpeningBalance {
-		return fmt.Errorf("year opening balance %d does not equal first month opening balance %d",
-			y.OpeningBalance, firstMonth.OpeningBalance)
+		return fmt.Errorf("Y-2: year opening balance does not equal first month opening balance (expected: %d, got: %d)",
+			firstMonth.OpeningBalance, y.OpeningBalance)
 	}
 
 	// Y-3: Year closing_balance equals last month's closing_balance
 	lastMonth := y.Months[monthNums[len(monthNums)-1]]
 	if y.ClosingBalance != lastMonth.ClosingBalance {
-		return fmt.Errorf("year closing balance %d does not equal last month closing balance %d",
-			y.ClosingBalance, lastMonth.ClosingBalance)
+		return fmt.Errorf("Y-3: year closing balance does not equal last month closing balance (expected: %d, got: %d)",
+			lastMonth.ClosingBalance, y.ClosingBalance)
 	}
 
 	return nil

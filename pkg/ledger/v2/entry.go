@@ -23,7 +23,7 @@ func (e Entry) Validate(year, month int) error {
 	err := validation.ValidateStruct(&e,
 		validation.Field(&e.Amount, validation.Required),
 		validation.Field(&e.Note, validation.Required, validation.Length(1, 0)),
-		validation.Field(&e.Date, validation.Date("2006-01-02").Error("date format must be YYYY-MM-DD")),
+		validation.Field(&e.Date, validation.Date("2006-01-02").Error("E-3: date format must be YYYY-MM-DD")),
 	)
 	if err != nil {
 		return err
@@ -31,17 +31,17 @@ func (e Entry) Validate(year, month int) error {
 
 	date, ok, err := e.ParseDate()
 	if err != nil {
-		return fmt.Errorf("invalid date format: %w", err)
+		return fmt.Errorf("E-3: invalid date format: %w", err)
 	}
 
 	// E-1: If an entry has a date, that date must lie within the year and month of its parent Month object
 	if ok {
 		if year != 0 && date.Year() != year {
-			return fmt.Errorf("entry date year %d does not match expected year %d", date.Year(), year)
+			return fmt.Errorf("E-1: entry date year does not match expected year (expected: %d, got: %d)", year, date.Year())
 		}
 
 		if month != 0 && int(date.Month()) != month {
-			return fmt.Errorf("entry date month %d does not match expected month %d", int(date.Month()), month)
+			return fmt.Errorf("E-1: entry date month does not match expected month (expected: %d, got: %d)", month, int(date.Month()))
 		}
 	}
 

@@ -18,12 +18,12 @@ type Month struct {
 func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 	// M-0: Month key (monthNum) must be between 1 and 12 (inclusive)
 	if monthNum < 1 || monthNum > 12 {
-		return fmt.Errorf("month number must be between 1 and 12, got %d", monthNum)
+		return fmt.Errorf("M-0: month number must be between 1 and 12 (got: %d)", monthNum)
 	}
 
 	// M-5: A Month must contain at least one Account entry
 	if len(m.Accounts) == 0 {
-		return fmt.Errorf("month %d has no accounts", monthNum)
+		return fmt.Errorf("M-5: month must contain at least one account")
 	}
 
 	// Validate accounts
@@ -45,17 +45,17 @@ func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 		return account.OpeningBalance
 	})
 	if m.OpeningBalance != accountsOpeningSum {
-		return fmt.Errorf("month opening balance %d does not equal sum of account opening balances %d",
-			m.OpeningBalance, accountsOpeningSum)
+		return fmt.Errorf("M-2: month opening balance does not equal sum of account opening balances (expected: %d, got: %d)",
+			accountsOpeningSum, m.OpeningBalance)
 	}
 
-	// M-2: Month closing_balance equals sum of all account closing_balance values
+	// M-3: Month closing_balance equals sum of all account closing_balance values
 	accountsClosingSum := lo.SumBy(lo.Values(m.Accounts), func(account Account) int {
 		return account.ClosingBalance
 	})
 	if m.ClosingBalance != accountsClosingSum {
-		return fmt.Errorf("month closing balance %d does not equal sum of account closing balances %d",
-			m.ClosingBalance, accountsClosingSum)
+		return fmt.Errorf("M-3: month closing balance does not equal sum of account closing balances (expected: %d, got: %d)",
+			accountsClosingSum, m.ClosingBalance)
 	}
 
 	// M-4: Within each month, Σ(entry.amount where internal = true) must equal 0 (double-entry constraint)
@@ -63,13 +63,13 @@ func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 		return account.InternalEntriesSum()
 	})
 	if internalSum != 0 {
-		return fmt.Errorf("sum of internal entries must be 0, got %d", internalSum)
+		return fmt.Errorf("M-4: sum of internal entries must equal 0 (got: %d)", internalSum)
 	}
 
 	if prevMonth != nil {
 		// M-1: Consecutive months must chain totals
 		if prevMonth.ClosingBalance != m.OpeningBalance {
-			return fmt.Errorf("previous month closing balance %d does not equal current month opening balance %d",
+			return fmt.Errorf("M-1: month opening balance does not equal previous month closing balance (expected: %d, got: %d)",
 				prevMonth.ClosingBalance, m.OpeningBalance)
 		}
 
@@ -77,7 +77,7 @@ func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 		for accountName, prevAccount := range prevMonth.Accounts {
 			if _, exists := m.Accounts[accountName]; !exists {
 				if prevAccount.ClosingBalance != 0 {
-					return fmt.Errorf("account %s: cannot be omitted because previous month closing balance is %d (must be 0)",
+					return fmt.Errorf("A-4: account '%s' cannot be omitted with non-zero closing balance (got: %d)",
 						accountName, prevAccount.ClosingBalance)
 				}
 			}

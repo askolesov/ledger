@@ -75,7 +75,7 @@ func TestEntry_Validate(t *testing.T) {
 			year:    2025,
 			month:   1,
 			wantErr: true,
-			errMsg:  "date: date format must be YYYY-MM-DD",
+			errMsg:  "date: E-3: date format must be YYYY-MM-DD",
 		},
 		{
 			name: "invalid date value",
@@ -103,7 +103,7 @@ func TestEntry_Validate(t *testing.T) {
 			year:    2025,
 			month:   1,
 			wantErr: true,
-			errMsg:  "entry date year 2024 does not match expected year 2025",
+			errMsg:  "E-1: entry date year does not match expected year (expected: 2025, got: 2024)",
 		},
 		{
 			name: "month mismatch",
@@ -117,7 +117,7 @@ func TestEntry_Validate(t *testing.T) {
 			year:    2025,
 			month:   1,
 			wantErr: true,
-			errMsg:  "entry date month 2 does not match expected month 1",
+			errMsg:  "E-1: entry date month does not match expected month (expected: 1, got: 2)",
 		},
 	}
 

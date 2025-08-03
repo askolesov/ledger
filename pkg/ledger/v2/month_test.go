@@ -60,7 +60,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 0,
 			wantErr:  true,
-			errMsg:   "month number must be between 1 and 12, got 0",
+			errMsg:   "M-0: month number must be between 1 and 12 (got: 0)",
 		},
 		{
 			name: "invalid month number - too high",
@@ -77,7 +77,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 13,
 			wantErr:  true,
-			errMsg:   "month number must be between 1 and 12, got 13",
+			errMsg:   "M-0: month number must be between 1 and 12 (got: 13)",
 		},
 		{
 			name: "month with no accounts",
@@ -89,7 +89,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 1,
 			wantErr:  true,
-			errMsg:   "month 1 has no accounts",
+			errMsg:   "M-5: month must contain at least one account",
 		},
 		{
 			name: "opening balance mismatch with account sums",
@@ -119,7 +119,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 1,
 			wantErr:  true,
-			errMsg:   "month opening balance 1000 does not equal sum of account opening balances 500",
+			errMsg:   "M-2: month opening balance does not equal sum of account opening balances (expected: 500, got: 1000)",
 		},
 		{
 			name: "closing balance mismatch with account sums",
@@ -149,7 +149,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 1,
 			wantErr:  true,
-			errMsg:   "month closing balance 1200 does not equal sum of account closing balances 1500",
+			errMsg:   "M-3: month closing balance does not equal sum of account closing balances (expected: 1500, got: 1200)",
 		},
 		{
 			name: "internal entries sum not zero",
@@ -179,7 +179,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 1,
 			wantErr:  true,
-			errMsg:   "sum of internal entries must be 0, got 200",
+			errMsg:   "M-4: sum of internal entries must equal 0 (got: 200)",
 		},
 		{
 			name: "valid month with balanced internal entries",
@@ -245,7 +245,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 2,
 			wantErr:  true,
-			errMsg:   "opening balance 1000 does not equal previous month's closing balance 900",
+			errMsg:   "A-2: account opening balance does not equal previous month closing balance (expected: 900, got: 1000)",
 		},
 		{
 			name: "account omitted with non-zero previous closing balance",
@@ -285,7 +285,7 @@ func TestMonth_Validate(t *testing.T) {
 			year:     2024,
 			monthNum: 2,
 			wantErr:  true,
-			errMsg:   "account savings: cannot be omitted because previous month closing balance is 100 (must be 0)",
+			errMsg:   "A-4: account 'savings' cannot be omitted with non-zero closing balance (got: 100)",
 		},
 		{
 			name: "account omitted with zero previous closing balance - valid",

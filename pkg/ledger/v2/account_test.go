@@ -79,7 +79,7 @@ func TestAccount_Validate(t *testing.T) {
 			year:    2025,
 			month:   1,
 			wantErr: true,
-			errMsg:  "opening balance 1000 + entries sum 100 = 1100 does not equal closing balance 1200",
+			errMsg:  "A-1: account balance calculation incorrect (opening: 1000 + entries: 100 = 1100, expected closing: 1200)",
 		},
 		{
 			name: "invalid entry in account",
@@ -113,7 +113,7 @@ func TestAccount_Validate(t *testing.T) {
 			year:    2025,
 			month:   1,
 			wantErr: true,
-			errMsg:  "entry 0: entry date year 2024 does not match expected year 2025",
+			errMsg:  "entry 0: E-1: entry date year does not match expected year (expected: 2025, got: 2024)",
 		},
 		{
 			name: "previous account closing balance mismatch",
@@ -127,7 +127,7 @@ func TestAccount_Validate(t *testing.T) {
 			year:    2025,
 			month:   1,
 			wantErr: true,
-			errMsg:  "opening balance 1100 does not equal previous month's closing balance 1000",
+			errMsg:  "A-2: account opening balance does not equal previous month closing balance (expected: 1000, got: 1100)",
 		},
 		{
 			name: "new account with non-zero opening balance",
@@ -138,7 +138,7 @@ func TestAccount_Validate(t *testing.T) {
 			year:    2025,
 			month:   1,
 			wantErr: true,
-			errMsg:  "new account must start with opening balance 0, got 1000",
+			errMsg:  "A-3: new account must start with opening balance 0 (got: 1000)",
 		},
 	}
 
