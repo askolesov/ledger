@@ -14,24 +14,21 @@ import (
 func getV2ValidateCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "validate <file>",
-		Short: "Validate an Open Ledger Format v2.0 file",
-		Long: `Validate an Open Ledger Format v2.0 file for structural correctness and data integrity.
+		Short: "Validate OLF v2.0 file for structural correctness and data integrity",
+		Long: `Validate OLF v2.0 file for structural correctness and data integrity.
 
-This command reads the specified ledger file and performs comprehensive validation
-according to OLF v2.0 rules, including:
-- File format validation (YAML/JSON structure)
+Performs comprehensive validation including:
+- YAML/JSON structure validation
 - Data type validation
 - Balance calculations and consistency checks
 - Double-entry bookkeeping constraints
 - Account continuity validation
 - Cross-period balance verification
 
-Supported file formats: YAML (.yaml, .yml), JSON (.json)
-
 Examples:
   ledger validate ledger.yaml          # Validate OLF v2.0 YAML file
   ledger validate ledger.json          # Validate OLF v2.0 JSON file
-  ledger validate /path/to/ledger.yaml # Validate file with full path`,
+  ledger validate /path/to/ledger.yaml`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := args[0]
@@ -64,22 +61,19 @@ func getV2ReportCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "report <file>",
-		Short: "Generate financial reports from an Open Ledger Format v2.0 file",
-		Long: `Generate comprehensive financial reports from an Open Ledger Format v2.0 file.
+		Short: "Generate financial reports from OLF v2.0 file",
+		Long: `Generate financial reports from OLF v2.0 file.
 
-This command reads the specified ledger file, validates it according to OLF v2.0
-rules, and generates detailed financial reports showing income, expenses, and
-balance information organized by year and month.
+Reads, validates, and generates detailed financial reports showing income,
+expenses, and balance information organized by year and month.
 
-The default report shows a detailed table with:
+Default report shows detailed table with:
 - Opening balance for each month
 - Total income for the month
 - Total expenses for the month
 - Closing balance for the month
 
-Use the --short flag for a condensed view showing only monthly expenses.
-
-Supported file formats: YAML (.yaml, .yml), JSON (.json)
+Use --short flag for condensed view showing only monthly expenses.
 
 Examples:
   ledger report ledger.yaml            # Generate detailed monthly report
@@ -109,7 +103,7 @@ Examples:
 		},
 	}
 
-	cmd.Flags().BoolVarP(&short, "short", "s", false, "Generate a condensed report showing only monthly expenses")
+	cmd.Flags().BoolVarP(&short, "short", "s", false, "Generate condensed report showing only monthly expenses")
 
 	return cmd
 }

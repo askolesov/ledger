@@ -12,11 +12,11 @@ import (
 func getV1Cmd() *cobra.Command {
 	var v1Cmd = &cobra.Command{
 		Use:   "v1",
-		Short: "Commands for working with Open Ledger Format v1.0",
-		Long: `Commands for working with Open Ledger Format v1.0 (legacy format).
+		Short: "Commands for Open Ledger Format v1.0 (legacy)",
+		Long: `Commands for Open Ledger Format v1.0 (legacy format).
 
-The v1 subcommand provides access to the original OLF v1.0 functionality
-for backward compatibility with existing ledger files.`,
+Provides backward compatibility with existing OLF v1.0 ledger files.
+Supports YAML format only.`,
 	}
 
 	v1Cmd.AddCommand(getV1ValidateCmd())
@@ -28,21 +28,18 @@ for backward compatibility with existing ledger files.`,
 func getV1ValidateCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "validate <file>",
-		Short: "Validate an Open Ledger Format v1.0 file",
-		Long: `Validate an Open Ledger Format v1.0 file for structural correctness and data integrity.
+		Short: "Validate OLF v1.0 file for structural correctness and data integrity",
+		Long: `Validate OLF v1.0 file for structural correctness and data integrity.
 
-This command reads the specified ledger file and performs comprehensive validation
-according to OLF v1.0 rules, including:
-- File format validation (YAML structure)
-- Data type validation
+Performs comprehensive validation including:
+- YAML structure validation
+- Data type validation  
 - Balance calculations and consistency checks
 - Transaction integrity verification
 
-Supported file formats: YAML (.yaml, .yml)
-
 Examples:
   ledger v1 validate data.yaml         # Validate OLF v1.0 file
-  ledger v1 validate /path/to/ledger.yaml`,
+  ledger v1 validate /path/to/data.yaml`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := args[0]
@@ -71,22 +68,19 @@ func getV1ReportCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "report <file>",
-		Short: "Generate financial reports from an Open Ledger Format v1.0 file",
-		Long: `Generate comprehensive financial reports from an Open Ledger Format v1.0 file.
+		Short: "Generate financial reports from OLF v1.0 file",
+		Long: `Generate financial reports from OLF v1.0 file.
 
-This command reads the specified ledger file, validates it, and generates
-detailed financial reports showing income, expenses, and balance information
-organized by year and month.
+Reads, validates, and generates detailed financial reports showing income,
+expenses, and balance information organized by year and month.
 
-The default report shows a detailed table with:
-- Starting balance for each month
+Default report shows detailed table with:
+- Opening balance for each month
 - Total income for the month
 - Total expenses for the month  
-- Ending balance for the month
+- Closing balance for the month
 
-Use the --short flag for a condensed view showing only monthly expenses.
-
-Supported file formats: YAML (.yaml, .yml)
+Use --short flag for condensed view showing only monthly expenses.
 
 Examples:
   ledger v1 report data.yaml           # Generate detailed monthly report
@@ -116,7 +110,7 @@ Examples:
 		},
 	}
 
-	cmd.Flags().BoolVarP(&short, "short", "s", false, "Generate a condensed report showing only monthly expenses")
+	cmd.Flags().BoolVarP(&short, "short", "s", false, "Generate condensed report showing only monthly expenses")
 
 	return cmd
 }
@@ -124,7 +118,7 @@ Examples:
 func v1MonthlyReport(d v1.Data) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Year", "Month", "Starting", "Income", "Expenses", "Ending"})
+	t.AppendHeader(table.Row{"Year", "Month", "Opening", "Income", "Expenses", "Closing"})
 
 	for _, year := range d.Years {
 		t.AppendSeparator()
