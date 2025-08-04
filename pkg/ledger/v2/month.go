@@ -35,7 +35,7 @@ func (m Month) Validate(year, monthNum int, prevMonth *Month) error {
 			}
 		}
 
-		if err := account.Validate(year, monthNum, prevAccount); err != nil {
+		if err := account.Validate(year, monthNum, prevAccount, prevMonth != nil); err != nil {
 			return fmt.Errorf("account %s: %w", accountName, err)
 		}
 	}

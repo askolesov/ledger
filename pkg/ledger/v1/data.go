@@ -68,5 +68,5 @@ func ReadData(path string) (Data, error) {
 		err = fmt.Errorf("unsupported file format")
 	}
 
-	return data, nil
+	return data, err
 }

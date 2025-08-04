@@ -14,7 +14,7 @@ type Account struct {
 }
 
 // Validate validates an account according to OLF v2.0 rules
-func (a Account) Validate(year, month int, prevAccount *Account) error {
+func (a Account) Validate(year, month int, prevAccount *Account, hasPrevMonth bool) error {
 	// Validate all entries
 	for i, entry := range a.Entries {
 		if err := entry.Validate(year, month); err != nil {
@@ -29,16 +29,18 @@ func (a Account) Validate(year, month int, prevAccount *Account) error {
 			a.OpeningBalance, a.EntriesSum(), calculatedBalance, a.ClosingBalance)
 	}
 
-	if prevAccount != nil {
-		// A-2: If an account exists in consecutive months, prev.closing_balance = next.opening_balance
-		if a.OpeningBalance != prevAccount.ClosingBalance {
-			return fmt.Errorf("A-2: account opening balance does not equal previous month closing balance (expected: %d, got: %d)",
-				prevAccount.ClosingBalance, a.OpeningBalance)
-		}
-	} else {
-		// A-3: A new account must start with opening_balance = 0
-		if a.OpeningBalance != 0 {
-			return fmt.Errorf("A-3: new account must start with opening balance 0 (got: %d)", a.OpeningBalance)
+	if hasPrevMonth { // don't check for first month
+		if prevAccount != nil {
+			// A-2: If an account exists in consecutive months, prev.closing_balance = next.opening_balance
+			if a.OpeningBalance != prevAccount.ClosingBalance {
+				return fmt.Errorf("A-2: account opening balance does not equal previous month closing balance (expected: %d, got: %d)",
+					prevAccount.ClosingBalance, a.OpeningBalance)
+			}
+		} else {
+			// A-3: A new account must start with opening_balance = 0
+			if a.OpeningBalance != 0 {
+				return fmt.Errorf("A-3: new account must start with opening balance 0 (got: %d)", a.OpeningBalance)
+			}
 		}
 	}
 

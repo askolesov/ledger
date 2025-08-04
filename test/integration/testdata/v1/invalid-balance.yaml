@@ -1,0 +1,27 @@
+years:
+  - number: 2024
+    starting_balance: 0
+    ending_balance: 999  # Wrong! Should be 200 based on month calculations
+    months:
+      - number: 1
+        starting_balance: 0
+        ending_balance: 200
+        wallets:
+          - name: "Checking"
+            starting_balance: 0
+            ending_balance: 100
+            transactions:
+              - amount: 100
+                is_internal: false
+                comment: "Salary"
+                date: "2024-01-15"
+                category: "Income"
+          - name: "Savings"
+            starting_balance: 0
+            ending_balance: 100
+            transactions:
+              - amount: 100
+                is_internal: false
+                comment: "Interest"
+                date: "2024-01-31"
+                category: "Income"

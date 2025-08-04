@@ -1,0 +1,27 @@
+years:
+  - number: 2024
+    starting_balance: 1000
+    ending_balance: 1200
+    months:
+      - number: 1
+        starting_balance: 1000
+        ending_balance: 1200
+        wallets:
+          - name: "Checking"
+            starting_balance: 600
+            ending_balance: 700
+            transactions:
+              - amount: "not_a_number"  # Invalid: should be integer
+                is_internal: false
+                comment: "Salary"
+                date: "2024-01-15"
+                category: "Income"
+          - name: "Savings"
+            # Missing starting_balance field - required
+            ending_balance: 500
+            transactions:
+              - amount: 100
+                is_internal: false
+                # Missing comment field - required
+                date: "2024-01-31"
+                category: "Income"

@@ -1,0 +1,37 @@
+years:
+  2024:
+    opening_balance: 0
+    closing_balance: 999  # Wrong! Should be 200 based on month calculations
+    months:
+      1:
+        opening_balance: 0
+        closing_balance: 200
+        accounts:
+          Checking:
+            opening_balance: 0
+            closing_balance: 20
+            entries:
+              - amount: 50
+                internal: false
+                note: "Salary"
+                date: "2024-01-15"
+                tag: "Income"
+              - amount: -30
+                internal: true
+                note: "Transfer to Savings"
+                date: "2024-01-20"
+                tag: "Transfer"
+          Savings:
+            opening_balance: 0
+            closing_balance: 180
+            entries:
+              - amount: 30
+                internal: true
+                note: "Transfer from Checking"
+                date: "2024-01-20"
+                tag: "Transfer"
+              - amount: 150
+                internal: false
+                note: "Investment return"
+                date: "2024-01-25"
+                tag: "Income"

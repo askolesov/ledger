@@ -1,0 +1,144 @@
+years:
+  2023:
+    opening_balance: 1000
+    closing_balance: 1350
+    months:
+      1:
+        opening_balance: 1000
+        closing_balance: 1100
+        accounts:
+          Checking:
+            opening_balance: 600
+            closing_balance: 650
+            entries:
+              - amount: 200
+                internal: false
+                note: "Salary"
+                date: "2023-01-15"
+                tag: "Income"
+              - amount: -150
+                internal: false
+                note: "Rent"
+                date: "2023-01-01"
+                tag: "Housing"
+          Savings:
+            opening_balance: 400
+            closing_balance: 450
+            entries:
+              - amount: 50
+                internal: false
+                note: "Interest"
+                date: "2023-01-31"
+                tag: "Income"
+      2:
+        opening_balance: 1100
+        closing_balance: 1150
+        accounts:
+          Checking:
+            opening_balance: 650
+            closing_balance: 675
+            entries:
+              - amount: 25
+                internal: false
+                note: "Freelance"
+                date: "2023-02-15"
+                tag: "Income"
+          Savings:
+            opening_balance: 450
+            closing_balance: 475
+            entries:
+              - amount: 25
+                internal: false
+                note: "Interest"
+                date: "2023-02-28"
+                tag: "Income"
+      3:
+        opening_balance: 1150
+        closing_balance: 1350
+        accounts:
+          Checking:
+            opening_balance: 675
+            closing_balance: 775
+            entries:
+              - amount: 200
+                internal: false
+                note: "Salary"
+                date: "2023-03-15"
+                tag: "Income"
+              - amount: -100
+                internal: true
+                note: "Transfer to Savings"
+                date: "2023-03-20"
+                tag: "Transfer"
+          Savings:
+            opening_balance: 475
+            closing_balance: 575
+            entries:
+              - amount: 100
+                internal: true
+                note: "Transfer from Checking"
+                date: "2023-03-20"
+                tag: "Transfer"
+  2024:
+    opening_balance: 1350
+    closing_balance: 1500
+    months:
+      1:
+        opening_balance: 1350
+        closing_balance: 1400
+        accounts:
+          Checking:
+            opening_balance: 775
+            closing_balance: 775
+            entries:
+              - amount: 200
+                internal: false
+                note: "Salary"
+                date: "2024-01-15"
+                tag: "Income"
+              - amount: -150
+                internal: false
+                note: "Rent"
+                date: "2024-01-01"
+                tag: "Housing"
+              - amount: -50
+                internal: true
+                note: "Transfer to Savings"
+                date: "2024-01-25"
+                tag: "Transfer"
+          Savings:
+            opening_balance: 575
+            closing_balance: 625
+            entries:
+              - amount: 50
+                internal: true
+                note: "Transfer from Checking"
+                date: "2024-01-25"
+                tag: "Transfer"
+      2:
+        opening_balance: 1400
+        closing_balance: 1500
+        accounts:
+          Checking:
+            opening_balance: 775
+            closing_balance: 825
+            entries:
+              - amount: 200
+                internal: false
+                note: "Salary"
+                date: "2024-02-15"
+                tag: "Income"
+              - amount: -150
+                internal: false
+                note: "Rent"
+                date: "2024-02-01"
+                tag: "Housing"
+          Savings:
+            opening_balance: 625
+            closing_balance: 675
+            entries:
+              - amount: 50
+                internal: false
+                note: "Interest"
+                date: "2024-02-29"
+                tag: "Income"

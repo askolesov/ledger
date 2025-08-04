@@ -1,0 +1,144 @@
+years:
+  - number: 2023
+    starting_balance: 1000
+    ending_balance: 1350
+    months:
+      - number: 1
+        starting_balance: 1000
+        ending_balance: 1100
+        wallets:
+          - name: "Checking"
+            starting_balance: 600
+            ending_balance: 650
+            transactions:
+              - amount: 200
+                is_internal: false
+                comment: "Salary"
+                date: "2023-01-15"
+                category: "Income"
+              - amount: -150
+                is_internal: false
+                comment: "Rent"
+                date: "2023-01-01"
+                category: "Housing"
+          - name: "Savings"
+            starting_balance: 400
+            ending_balance: 450
+            transactions:
+              - amount: 50
+                is_internal: false
+                comment: "Interest"
+                date: "2023-01-31"
+                category: "Income"
+      - number: 2
+        starting_balance: 1100
+        ending_balance: 1150
+        wallets:
+          - name: "Checking"
+            starting_balance: 650
+            ending_balance: 675
+            transactions:
+              - amount: 25
+                is_internal: false
+                comment: "Freelance"
+                date: "2023-02-15"
+                category: "Income"
+          - name: "Savings"
+            starting_balance: 450
+            ending_balance: 475
+            transactions:
+              - amount: 25
+                is_internal: false
+                comment: "Interest"
+                date: "2023-02-28"
+                category: "Income"
+      - number: 3
+        starting_balance: 1150
+        ending_balance: 1350
+        wallets:
+          - name: "Checking"
+            starting_balance: 675
+            ending_balance: 775
+            transactions:
+              - amount: 200
+                is_internal: false
+                comment: "Salary"
+                date: "2023-03-15"
+                category: "Income"
+              - amount: -100
+                is_internal: true
+                comment: "Transfer to Savings"
+                date: "2023-03-20"
+                category: "Transfer"
+          - name: "Savings"
+            starting_balance: 475
+            ending_balance: 575
+            transactions:
+              - amount: 100
+                is_internal: true
+                comment: "Transfer from Checking"
+                date: "2023-03-20"
+                category: "Transfer"
+  - number: 2024
+    starting_balance: 1350
+    ending_balance: 1500
+    months:
+      - number: 1
+        starting_balance: 1350
+        ending_balance: 1400
+        wallets:
+          - name: "Checking"
+            starting_balance: 775
+            ending_balance: 775
+            transactions:
+              - amount: 200
+                is_internal: false
+                comment: "Salary"
+                date: "2024-01-15"
+                category: "Income"
+              - amount: -150
+                is_internal: false
+                comment: "Rent"
+                date: "2024-01-01"
+                category: "Housing"
+              - amount: -50
+                is_internal: true
+                comment: "Transfer to Savings"
+                date: "2024-01-25"
+                category: "Transfer"
+          - name: "Savings"
+            starting_balance: 575
+            ending_balance: 625
+            transactions:
+              - amount: 50
+                is_internal: true
+                comment: "Transfer from Checking"
+                date: "2024-01-25"
+                category: "Transfer"
+      - number: 2
+        starting_balance: 1400
+        ending_balance: 1500
+        wallets:
+          - name: "Checking"
+            starting_balance: 775
+            ending_balance: 825
+            transactions:
+              - amount: 200
+                is_internal: false
+                comment: "Salary"
+                date: "2024-02-15"
+                category: "Income"
+              - amount: -150
+                is_internal: false
+                comment: "Rent"
+                date: "2024-02-01"
+                category: "Housing"
+          - name: "Savings"
+            starting_balance: 625
+            ending_balance: 675
+            transactions:
+              - amount: 50
+                is_internal: false
+                comment: "Interest"
+                date: "2024-02-29"
+                category: "Income"

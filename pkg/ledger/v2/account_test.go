@@ -9,19 +9,33 @@ import (
 
 func TestAccount_Validate(t *testing.T) {
 	tests := []struct {
-		name        string
-		prevAccount *Account
-		account     Account
-		year        int
-		month       int
-		wantErr     bool
-		errMsg      string
+		name         string
+		prevAccount  *Account
+		hasPrevMonth bool
+		account      Account
+		year         int
+		month        int
+		wantErr      bool
+		errMsg       string
 	}{
 		{
 			name: "valid account with no entries",
 			prevAccount: &Account{
 				ClosingBalance: 1000,
 			},
+			hasPrevMonth: true,
+			account: Account{
+				OpeningBalance: 1000,
+				ClosingBalance: 1000,
+				Entries:        []Entry{},
+			},
+			year:    2025,
+			month:   1,
+			wantErr: false,
+		},
+		{
+			name:         "valid account with no entries and no previous month",
+			hasPrevMonth: false,
 			account: Account{
 				OpeningBalance: 1000,
 				ClosingBalance: 1000,
@@ -36,6 +50,7 @@ func TestAccount_Validate(t *testing.T) {
 			prevAccount: &Account{
 				ClosingBalance: 1000,
 			},
+			hasPrevMonth: true,
 			account: Account{
 				OpeningBalance: 1000,
 				ClosingBalance: 1200,
@@ -52,6 +67,7 @@ func TestAccount_Validate(t *testing.T) {
 			prevAccount: &Account{
 				ClosingBalance: 1000,
 			},
+			hasPrevMonth: true,
 			account: Account{
 				OpeningBalance: 1000,
 				ClosingBalance: 1100,
@@ -69,6 +85,7 @@ func TestAccount_Validate(t *testing.T) {
 			prevAccount: &Account{
 				ClosingBalance: 1000,
 			},
+			hasPrevMonth: true,
 			account: Account{
 				OpeningBalance: 1000,
 				ClosingBalance: 1200,
@@ -86,6 +103,7 @@ func TestAccount_Validate(t *testing.T) {
 			prevAccount: &Account{
 				ClosingBalance: 1000,
 			},
+			hasPrevMonth: true,
 			account: Account{
 				OpeningBalance: 1000,
 				ClosingBalance: 1000,
@@ -120,6 +138,7 @@ func TestAccount_Validate(t *testing.T) {
 			prevAccount: &Account{
 				ClosingBalance: 1000,
 			},
+			hasPrevMonth: true,
 			account: Account{
 				OpeningBalance: 1100,
 				ClosingBalance: 1100,
@@ -130,7 +149,8 @@ func TestAccount_Validate(t *testing.T) {
 			errMsg:  "A-2: account opening balance does not equal previous month closing balance (expected: 1000, got: 1100)",
 		},
 		{
-			name: "new account with non-zero opening balance",
+			name:         "new account with non-zero opening balance",
+			hasPrevMonth: true,
 			account: Account{
 				OpeningBalance: 1000,
 				ClosingBalance: 1000,
@@ -144,7 +164,7 @@ func TestAccount_Validate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tt.account.Validate(tt.year, tt.month, tt.prevAccount)
+			err := tt.account.Validate(tt.year, tt.month, tt.prevAccount, tt.hasPrevMonth)
 			if tt.wantErr {
 				require.Error(t, err)
 				if tt.errMsg != "" {
@@ -405,9 +425,6 @@ func TestAccount_Expenses(t *testing.T) {
 
 func TestAccount_Integration(t *testing.T) {
 	// Test a realistic account scenario
-	prevAccount := &Account{
-		ClosingBalance: 1000,
-	}
 	account := Account{
 		OpeningBalance: 1000,
 		ClosingBalance: 1250,
@@ -421,7 +438,7 @@ func TestAccount_Integration(t *testing.T) {
 	}
 
 	t.Run("validate account", func(t *testing.T) {
-		err := account.Validate(2025, 1, prevAccount)
+		err := account.Validate(2025, 1, nil, false)
 		require.NoError(t, err)
 	})
 

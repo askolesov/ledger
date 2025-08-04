@@ -1,0 +1,32 @@
+years:
+  2024:
+    opening_balance: 1000
+    closing_balance: 1200
+    months:
+      1:
+        opening_balance: 1000
+        closing_balance: 1200
+        accounts:
+          Checking:
+            opening_balance: 600
+            closing_balance: 620
+            entries:
+              - amount: "not_a_number"  # Invalid: should be integer
+                internal: false
+                note: "Salary"
+                date: "2024-01-15"
+                tag: "Income"
+              - amount: -30
+                internal: true
+                # Missing note field - required
+                date: "2024-01-20"
+                tag: "Transfer"
+          Savings:
+            # Missing opening_balance field - required
+            closing_balance: 580
+            entries:
+              - amount: 30
+                internal: true
+                note: "Transfer from Checking"
+                date: "invalid-date-format"  # Invalid date format
+                tag: "Transfer"

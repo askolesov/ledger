@@ -1,7 +1,12 @@
 package main
 
-import "go-finances/pkg/command"
+import (
+	"go-finances/pkg/command"
+	"os"
+)
 
 func main() {
-	_ = command.GetRootCmd().Execute()
+	if err := command.GetRootCmd().Execute(); err != nil {
+		os.Exit(1)
+	}
 }
