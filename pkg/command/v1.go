@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	v1 "go-finances/pkg/ledger/v1"
+	v2 "go-finances/pkg/ledger/v2"
 	"os"
 
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -21,6 +22,7 @@ Supports YAML format only.`,
 
 	v1Cmd.AddCommand(getV1ValidateCmd())
 	v1Cmd.AddCommand(getV1ReportCmd())
+	v1Cmd.AddCommand(getV1MigrateCmd())
 
 	return v1Cmd
 }
@@ -143,5 +145,125 @@ func v1ShortMonthlyReport(d v1.Data) {
 		for _, month := range year.Months {
 			fmt.Printf("%.1f\n", float64(month.Expenses())/1000)
 		}
+	}
+}
+
+func getV1MigrateCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "migrate <input-file> <output-file>",
+		Short: "Migrate OLF v1.0 file to OLF v2.0 format",
+		Long: `Migrate OLF v1.0 file to OLF v2.0 format.
+
+Reads an existing OLF v1.0 ledger file, validates it, converts it to the new
+OLF v2.0 format, and writes the result to the specified output file.
+
+The migration process:
+- Validates the input v1.0 file for correctness
+- Converts the data structure from v1.0 to v2.0 format
+- Maps wallets to accounts and transactions to entries
+- Preserves all financial data and balances
+- Validates the converted v2.0 data before writing
+
+Examples:
+  ledger v1 migrate data-v1.yaml data-v2.yaml    # Migrate YAML file
+  ledger v1 migrate data-v1.json data-v2.json    # Migrate JSON file`,
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			inputPath := args[0]
+			outputPath := args[1]
+
+			return migrateV1ToV2(cmd, inputPath, outputPath)
+		},
+	}
+}
+
+func migrateV1ToV2(cmd *cobra.Command, inputPath, outputPath string) error {
+	// Read and validate v1 data
+	cmd.Printf("Reading v1.0 ledger file: %s\n", inputPath)
+	v1Data, err := v1.ReadData(inputPath)
+	if err != nil {
+		return fmt.Errorf("failed to read v1.0 ledger file: %w", err)
+	}
+
+	cmd.Println("Validating v1.0 data...")
+	err = v1Data.Validate()
+	if err != nil {
+		return fmt.Errorf("v1.0 data validation failed: %w", err)
+	}
+
+	// Convert v1 to v2
+	cmd.Println("Converting v1.0 to v2.0 format...")
+	v2Ledger := convertV1ToV2(v1Data)
+
+	// Validate v2 data
+	cmd.Println("Validating converted v2.0 data...")
+	err = v2Ledger.Validate()
+	if err != nil {
+		return fmt.Errorf("converted v2.0 data validation failed: %w", err)
+	}
+
+	// Write v2 data
+	cmd.Printf("Writing v2.0 ledger file: %s\n", outputPath)
+	err = v2.WriteLedger(v2Ledger, outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to write v2.0 ledger file: %w", err)
+	}
+
+	cmd.Println("✓ Migration completed successfully")
+	return nil
+}
+
+func convertV1ToV2(v1Data v1.Data) v2.Ledger {
+	v2Years := make(map[int]v2.Year)
+
+	for _, v1Year := range v1Data.Years {
+		v2Months := make(map[int]v2.Month)
+
+		for _, v1Month := range v1Year.Months {
+			v2Accounts := make(map[string]v2.Account)
+
+			for _, v1Wallet := range v1Month.Wallets {
+				var v2Entries []v2.Entry
+
+				for _, v1Transaction := range v1Wallet.Transactions {
+					v2Entry := v2.Entry{
+						Amount:   v1Transaction.Amount,
+						Internal: v1Transaction.IsInternal,
+						Note:     v1Transaction.Comment,
+						Date:     v1Transaction.Date,
+						Tag:      v1Transaction.Category,
+					}
+					v2Entries = append(v2Entries, v2Entry)
+				}
+
+				v2Account := v2.Account{
+					OpeningBalance: v1Wallet.StartingBalance,
+					ClosingBalance: v1Wallet.EndingBalance,
+					Entries:        v2Entries,
+				}
+
+				v2Accounts[v1Wallet.Name] = v2Account
+			}
+
+			v2Month := v2.Month{
+				OpeningBalance: v1Month.StartingBalance,
+				ClosingBalance: v1Month.EndingBalance,
+				Accounts:       v2Accounts,
+			}
+
+			v2Months[v1Month.Number] = v2Month
+		}
+
+		v2Year := v2.Year{
+			OpeningBalance: v1Year.StartingBalance,
+			ClosingBalance: v1Year.EndingBalance,
+			Months:         v2Months,
+		}
+
+		v2Years[v1Year.Number] = v2Year
+	}
+
+	return v2.Ledger{
+		Years: v2Years,
 	}
 }
