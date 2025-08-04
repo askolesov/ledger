@@ -149,7 +149,9 @@ func TestWriteLedger(t *testing.T) {
 	// Create a temporary directory for test files
 	tempDir, err := os.MkdirTemp("", "ledger_write_test")
 	require.NoError(t, err)
-	defer require.NoError(t, os.RemoveAll(tempDir))
+	defer func() {
+		require.NoError(t, os.RemoveAll(tempDir))
+	}()
 
 	// Test data
 	testLedger := Ledger{

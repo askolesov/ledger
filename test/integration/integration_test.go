@@ -142,7 +142,9 @@ func TestV2ValidateInvalidStructure(t *testing.T) {
 func TestV1MigrateToV2(t *testing.T) {
 	// Create temporary output file
 	outputFile := filepath.Join("testdata", "migration", "output.yaml")
-	defer require.NoError(t, os.Remove(outputFile)) // Clean up after test
+	defer func() {
+		require.NoError(t, os.Remove(outputFile)) // Clean up after test
+	}()
 
 	// Run migration
 	stdout, stderr, exitCode := runCommand(t, "v1", "migrate",
