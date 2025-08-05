@@ -39,8 +39,8 @@ archives:
 
 dockers:
   - image_templates:
-      - "gcr.io/askolesov/{{.ProjectName}}:{{.Tag}}"
-      - "gcr.io/askolesov/{{.ProjectName}}:latest"
+      - "ghcr.io/askolesov/{{.ProjectName}}:{{.Tag}}"
+      - "ghcr.io/askolesov/{{.ProjectName}}:latest"
 
 changelog:
   sort: asc
