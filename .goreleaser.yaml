@@ -33,7 +33,8 @@ archives:
 
 dockers:
   - image_templates:
-      - "{{.Env.GITHUB_ACTOR}}/{{.ProjectName}}"
+      - "gcr.io/askolesov/{{.ProjectName}}:{{.Tag}}"
+      - "gcr.io/askolesov/{{.ProjectName}}:latest"
 
 changelog:
   sort: asc
