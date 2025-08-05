@@ -1,6 +1,6 @@
 # Ledger
 
-[![Build Status](https://github.com/askolesov/ledger/workflows/build/badge.svg)](https://github.com/askolesov/ledger/actions)
+[![Build status](https://github.com/askolesov/ledger/actions/workflows/build.yml/badge.svg)](https://github.com/askolesov/ledger/actions/workflows/build.yml)
 [![Go Version](https://img.shields.io/badge/go-1.24-blue.svg)](https://golang.org)
 [![License](https://img.shields.io/badge/license-CC--BY--4.0-green.svg)](LICENSE)
 
