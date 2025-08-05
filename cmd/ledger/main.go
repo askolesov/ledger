@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-finances/pkg/command"
+	"ledger/pkg/command"
 	"os"
 )
 

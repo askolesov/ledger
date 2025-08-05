@@ -2,7 +2,7 @@ package command
 
 import (
 	"fmt"
-	v2 "go-finances/pkg/ledger/v2"
+	v2 "ledger/pkg/ledger/v2"
 	"os"
 	"sort"
 

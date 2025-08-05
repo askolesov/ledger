@@ -15,6 +15,12 @@ builds:
       - linux
       - windows
       - darwin
+    ldflags:
+      - -s -w
+      - -X ledger/pkg/command.version={{.Version}}
+      - -X ledger/pkg/command.commit={{.Commit}}
+      - -X ledger/pkg/command.date={{.Date}}
+      - -X ledger/pkg/command.builtBy=goreleaser
 
 archives:
   - formats: [tar.gz]

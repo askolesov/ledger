@@ -2,8 +2,8 @@ package command
 
 import (
 	"fmt"
-	v1 "go-finances/pkg/ledger/v1"
-	v2 "go-finances/pkg/ledger/v2"
+	v1 "ledger/pkg/ledger/v1"
+	v2 "ledger/pkg/ledger/v2"
 	"os"
 
 	"github.com/jedib0t/go-pretty/v6/table"

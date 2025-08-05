@@ -17,11 +17,15 @@ Examples:
   ledger report ledger.yaml            # Generate OLF v2.0 report
   ledger v1 validate data.yaml         # Validate OLF v1.0 file
   ledger v1 report data.yaml           # Generate OLF v1.0 report`,
+		Version: version,
 	}
 
 	// Add v2 commands as root commands
 	rootCmd.AddCommand(getV2ValidateCmd())
 	rootCmd.AddCommand(getV2ReportCmd())
+
+	// Add version command
+	rootCmd.AddCommand(getVersionCmd())
 
 	// Add v1 subcommand
 	rootCmd.AddCommand(getV1Cmd())
